@@ -27,7 +27,7 @@
 1. Клонируйте репозиторий:
 
 ```sh
-https://github.com/Kortium/timetable_bot.git
+git clone https://github.com/Kortium/timetable_bot.git
 cd timetable_bot
 ```
 
