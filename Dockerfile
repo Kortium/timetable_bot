@@ -6,4 +6,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "telegram_main.py"]
+CMD ["python", "src/telegram_main.py"]

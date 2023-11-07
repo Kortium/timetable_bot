@@ -27,8 +27,8 @@
 1. Клонируйте репозиторий:
 
 ```sh
-git clone https://yourrepository.git
-cd yourrepository
+https://github.com/Kortium/timetable_bot.git
+cd timetable_bot
 ```
 
 2. Создайте и активируйте виртуальное окружение:
