@@ -1,3 +1,13 @@
+import os
+import sys
+
+# Получаем абсолютный путь к директории, где находится main.py
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+# Добавляем путь к папке scripts, чтобы мы могли импортировать из неё модули
+scripts_path = os.path.join(dir_path, '..', 'scripts')
+sys.path.append(scripts_path)
+
 from datetime import datetime
 from build_svg import prepare_data, TableFormer  # Импортируем необходимые функции и классы для работы со временем и создания SVG
 from parse_xls import read_xlsx  # Импортируем функцию для чтения xlsx файла
@@ -12,7 +22,7 @@ def datetime_serializer(obj):
         return obj  # В противном случае возвращаем объект без изменений
 
 if __name__ == '__main__':
-    file_name = "example.xlsx"
+    file_name = "data/example.xlsx"
     name, exercises, errors = read_xlsx(file_name)  # Читаем данные из xlsx файла и получаем имя, занятия и ошибки
     start_date = datetime(2023, 9, 1)  # Начальная дата для генерации расписания
     end_date = datetime(2023, 12, 31)  # Конечная дата для генерации расписания

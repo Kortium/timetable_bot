@@ -1,6 +1,14 @@
-from dotenv import load_dotenv
 import os
+import sys
 
+# Получаем абсолютный путь к директории, где находится main.py
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+# Добавляем путь к папке scripts, чтобы мы могли импортировать из неё модули
+scripts_path = os.path.join(dir_path, '..', 'scripts')
+sys.path.append(scripts_path)
+
+from dotenv import load_dotenv
 from build_svg import prepare_data, TableFormer  # Импорт функций для подготовки данных и формирования SVG таблицы
 from parse_xls import read_xlsx  # Импорт функции для чтения данных из xlsx файла
 import cairosvg  # Импорт модуля для конвертации SVG в PDF
