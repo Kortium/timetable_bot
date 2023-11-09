@@ -4,3 +4,4 @@ __pycache__/
 *.json
 *.pdf
 *.svg
+venv/
