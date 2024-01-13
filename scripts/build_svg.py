@@ -10,8 +10,8 @@ from parse_xls import extract_initials, shorten_group  # Подключение 
 from PIL import ImageFont
 
 # Задаем начальную и конечную даты семестра
-SEM_START = datetime(2023, 9, 1)
-SEM_END = datetime(2023, 12, 31)
+SEM_START = datetime(2024, 2, 12)
+SEM_END = datetime(2024, 6, 1)
 
 # Получаем текущую директорию, где находится выполняемый скрипт
 current_directory = os.path.dirname(os.path.abspath(__file__))

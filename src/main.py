@@ -24,8 +24,8 @@ def datetime_serializer(obj):
 if __name__ == '__main__':
     file_name = "data/example.xlsx"
     name, exercises, errors = read_xlsx(file_name)  # Читаем данные из xlsx файла и получаем имя, занятия и ошибки
-    start_date = datetime(2023, 9, 1)  # Начальная дата для генерации расписания
-    end_date = datetime(2023, 12, 31)  # Конечная дата для генерации расписания
+    start_date = datetime(2024, 2, 12)  # Начальная дата для генерации расписания
+    end_date = datetime(2024, 6, 1)  # Конечная дата для генерации расписания
     # Подготавливаем данные для построения SVG
     exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
     data = {
