@@ -16,11 +16,15 @@ SEM_END = datetime(2024, 6, 1)
 # Получаем текущую директорию, где находится выполняемый скрипт
 current_directory = os.path.dirname(os.path.abspath(__file__))
 # Определяем путь к шрифту
-FONT_PATH = os.path.join(current_directory, "times.ttf")
+FONT_PATH = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" # Пример пути к шрифту
 
 # Функция для вычисления ширины текста при отображении
 def get_text_width(text, font_size=10):
-    font = ImageFont.truetype(FONT_PATH, font_size)  # Загружаем шрифт
+    try:
+        font = ImageFont.truetype(FONT_PATH, font_size)  # Загружаем шрифт
+    except:
+        FONT_PATH = os.path.join(current_directory, "times.ttf")
+        font = ImageFont.truetype(FONT_PATH, font_size)  # Загружаем шрифт
     width = font.getlength(text)*1.2  # Вычисляем длину текста с учетом шрифта
     return width
 
