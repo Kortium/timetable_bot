@@ -10,11 +10,12 @@ sys.path.append(scripts_path)
 
 from dotenv import load_dotenv
 from build_svg import prepare_data, TableFormer  # Импорт функций для подготовки данных и формирования SVG таблицы
-from parse_xls import read_xlsx  # Импорт функции для чтения данных из xlsx файла
+from parse_xls import read_professor, read_student, check_type, DocType  # Импорт функции для чтения данных из xlsx файла
 import cairosvg  # Импорт модуля для конвертации SVG в PDF
 from telegram import Update  # Импорт класса Update для обработки обновлений в Telegram
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext  # Импорт необходимых классов для работы бота
 import datetime  # Импорт модуля datetime для работы с датами
+import traceback
 
 # Загрузка переменных окружения из файла .env
 load_dotenv()
@@ -59,32 +60,64 @@ def handle_text(update: Update, context: CallbackContext) -> None:
         update.message.reply_text("Ошибка в формате даты! Пожалуйста, используйте формат 'ДД.ММ-ДД.ММ'.")
     try:
         # Читаем данные из файла и подготавливаем их
-        name, exercises, errors = read_xlsx(f'recieved_timetable_{user_id}.xlsx')
-        exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
+        # Проверить тип документа, студент или преподаватель и в зависимости от этого по разному разбирать
+        type = check_type(f'recieved_timetable_{user_id}.xlsx')
+        if type == DocType.PROFESSOR:
+            name, exercises, errors = read_professor(f'recieved_timetable_{user_id}.xlsx')
+            exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
+            try:
+                # Создаём расписание в виде SVG и конвертируем его в PDF
+                svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                svg_table_former.draw_timetable()
+                svg_table_former.save()
+                cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
+                processed_file_path = f"timetable_{user_id}.pdf"
+                # Отправляем сформированный PDF пользователю
+                update.message.reply_document(open(processed_file_path, 'rb'))
+                if len(errors) > 0:
+                    # Если в процессе обработки возникли ошибки, сообщаем об этом пользователю
+                    update.message.reply_text("Ваше расписание готово!\nОбратите внимание что в изначальном расписании есть наложения:")
+                    update.message.reply_text(errors)
+                else:
+                    # Если ошибок нет, сообщаем, что расписание готово
+                    update.message.reply_text("Ваше расписание готово!")
+                # Уведомляем админа о завершении формирования расписания
+                notify_admin(context, f"Пользователь {user_name} сформировал расписание для {name}.")
+            except:
+                # В случае неизвестной ошибки сообщаем пользователю обратиться к разработчику
+                update.message.reply_text("Неизвестная ошибка при формировании расписания. Обратитесь к разработчику.")
+        if type == DocType.STUDENT:
+            group, exercises, errors = read_student(f'recieved_timetable_{user_id}.xlsx')
+            exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
+            try:
+                # Создаём расписание в виде SVG и конвертируем его в PDF
+                svg_table_former = TableFormer(group, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                svg_table_former.draw_timetable()
+                svg_table_former.save()
+                cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
+                processed_file_path = f"timetable_{user_id}.pdf"
+                # Отправляем сформированный PDF пользователю
+                update.message.reply_document(open(processed_file_path, 'rb'))
+                if len(errors) > 0:
+                    # Если в процессе обработки возникли ошибки, сообщаем об этом пользователю
+                    update.message.reply_text("Ваше расписание готово!\nОбратите внимание что в изначальном расписании есть наложения:")
+                    if len(errors) < 4096:
+                        update.message.reply_text(errors)
+                    else:
+                        update.message.reply_text(errors[0:4093]+'...')
+                else:
+                    # Если ошибок нет, сообщаем, что расписание готово
+                    update.message.reply_text("Ваше расписание готово!")
+                # Уведомляем админа о завершении формирования расписания
+                notify_admin(context, f"Пользователь {user_name} сформировал расписание для группы {group}.")
+            except Exception as e:
+                error_traceback = traceback.format_exc()
+                print(error_traceback)
+                # В случае неизвестной ошибки сообщаем пользователю обратиться к разработчику
+                update.message.reply_text("Неизвестная ошибка при формировании расписания. Обратитесь к разработчику.")
     except:
         # В случае ошибки при чтении файла отправляем сообщение пользователю
         update.message.reply_text("Возникла ошибка при разборе файла, проверьте ваш файл и загрузите его снова или обратитесь к разработчику.")
-    try:
-        # Создаём расписание в виде SVG и конвертируем его в PDF
-        svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
-        svg_table_former.draw_timetable()
-        svg_table_former.save()
-        cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
-        processed_file_path = f"timetable_{user_id}.pdf"
-        # Отправляем сформированный PDF пользователю
-        update.message.reply_document(open(processed_file_path, 'rb'))
-        if len(errors) > 0:
-            # Если в процессе обработки возникли ошибки, сообщаем об этом пользователю
-            update.message.reply_text("Ваше расписание готово!\nОбратите внимание что в изначальном расписании есть наложения:")
-            update.message.reply_text(errors)
-        else:
-            # Если ошибок нет, сообщаем, что расписание готово
-            update.message.reply_text("Ваше расписание готово!")
-        # Уведомляем админа о завершении формирования расписания
-        notify_admin(context, f"Пользователь {user_name} сформировал расписание для {name}.")
-    except:
-        # В случае неизвестной ошибки сообщаем пользователю обратиться к разработчику
-        update.message.reply_text("Неизвестная ошибка при формировании расписания. Обратитесь к разработчику.")
 
 def handle_unknown_document(update: Update, context: CallbackContext):
     # Обработчик для неизвестных документов

@@ -9,9 +9,10 @@ from datetime import timedelta, datetime
 from parse_xls import extract_initials, shorten_group  # Подключение специализированных функций из файла parse_xls.py
 from PIL import ImageFont
 
+
 # Задаем начальную и конечную даты семестра
-SEM_START = datetime(2024, 2, 12)
-SEM_END = datetime(2024, 6, 1)
+SEM_START = datetime(2024, 9, 2)
+SEM_END = datetime(2024, 12, 31)
 
 # Получаем текущую директорию, где находится выполняемый скрипт
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -25,7 +26,7 @@ def get_text_width(text, font_size=10):
     except:
         FONT_PATH = os.path.join(current_directory, "times.ttf")
         font = ImageFont.truetype(FONT_PATH, font_size)  # Загружаем шрифт
-    width = font.getlength(text)*1.2  # Вычисляем длину текста с учетом шрифта
+    width = font.getlength(text)*1.1  # Вычисляем длину текста с учетом шрифта
     return width
 
 # Функция подготовки данных для расписания
@@ -89,7 +90,10 @@ def save_to_json(timetable_data, filename="data.json"):
 
 # Функция получения цвета для элемента расписания
 def get_color(subject, exercise_type, group):
-    unique_str = subject + exercise_type + group[0]  # Создаем уникальную строку
+    if len(group) > 0:
+        unique_str = subject + exercise_type + group[0]  # Создаем уникальную строку
+    else:
+        unique_str = subject + exercise_type
     hash_value = int(hashlib.md5(unique_str.encode()).hexdigest(), 16)  # Получаем хеш-значение
     # Преобразуем хеш в цвет в HSV, а затем в RGB
     hue = (hash_value % 360) / 360.0
@@ -114,7 +118,7 @@ def generate_date_list(start_date, end_date):
     return date_list  # Возвращаем список дат
 
 def get_font_size(name, name_column_width):
-    font_size = 20  # Начинаем с размера шрифта 20
+    font_size = 18  # Начинаем с размера шрифта 20
     # Уменьшаем размер шрифта до тех пор, пока текст не поместится в заданную ширину
     while font_size > 1:
         width = get_text_width(name, font_size)
@@ -168,7 +172,8 @@ def form_text(subject, exercise_type, groups, room, height, width):
                 i += 1
             merged.append(current_element)
         return merged
-    elements = try_merge_elements(elements)
+    if len(groups) > 18:
+        elements = try_merge_elements(elements)
 
     # Уменьшаем размер шрифта, пока текст не поместится в ячейку
     while max_font_size > 1:
@@ -243,8 +248,9 @@ class TableFormer:
         self.cell_height = 46
 
         # Расчет полной ширины и высоты.
-        self.week_start_number = (self.start_date - SEM_START).days // 7
-        self.week_start_number += 1
+        days_difference = (self.start_date - SEM_START).days
+        week_number = days_difference // 7
+        self.week_start_number = week_number
         self.week_count = (self.end_date - self.start_date).days // 7
         self.full_width = 297 * 3.78
         self.cell_width = (self.full_width - self.margin_left * 2 - self.name_column) / self.week_count
@@ -259,7 +265,7 @@ class TableFormer:
             subject = exercise["subject"]
         else:
             subject = extract_initials(exercise["subject"])
-        group = exercise["group"]
+        group = exercise.get("group", exercise.get("professor"))
         room = exercise["room"]
 
         fill_color = get_color(subject, exercise["type"], group)
@@ -366,7 +372,7 @@ class TableFormer:
                 _, exercise_week_number, exercise_week_day = exercise["date"].isocalendar()
                 _, start_week_number, _ = self.start_date.isocalendar()
                 if start_week_number > exercise_week_number:
-                    start_week_number = 1
+                    exercise_week_number = 53
                 column_index = exercise_week_number-start_week_number
                 x = self.margin_left + self.name_column + column_index * self.cell_width
                 y = self.weekday_margin[exercise_week_day] + self.weekday_time_spans[exercise_week_day].index(
