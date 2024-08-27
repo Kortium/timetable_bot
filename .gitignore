@@ -8,3 +8,5 @@ venv/
 scripts/times.ttf
 data/*
 env/
+myenv/
+*.xlsx
