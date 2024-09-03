@@ -136,7 +136,9 @@ def handle_text(update: Update, context: CallbackContext) -> None:
                 print(error_traceback)
                 # В случае неизвестной ошибки сообщаем пользователю обратиться к разработчику
                 update.message.reply_text("Неизвестная ошибка при формировании расписания. Обратитесь к разработчику.")
-    except:
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        print(error_traceback)
         # В случае ошибки при чтении файла отправляем сообщение пользователю
         update.message.reply_text("Возникла ошибка при разборе файла, проверьте ваш файл и загрузите его снова или обратитесь к разработчику.")
 
@@ -241,7 +243,9 @@ def auto_range(update: Update, context: CallbackContext) -> None:
                 print(error_traceback)
                 # В случае неизвестной ошибки сообщаем пользователю обратиться к разработчику
                 context.bot.send_message(chat_id=user_id, text="Неизвестная ошибка при формировании расписания. Обратитесь к разработчику.")
-    except:
+    except Exception as e:
+        error_traceback = traceback.format_exc()
+        print(error_traceback)
         # В случае ошибки при чтении файла отправляем сообщение пользователю
         context.bot.send_message(chat_id=user_id, text="Возникла ошибка при разборе файла, проверьте ваш файл и загрузите его снова или обратитесь к разработчику.")
 

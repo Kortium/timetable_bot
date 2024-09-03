@@ -106,7 +106,7 @@ def extract_single_lesson_info(lesson):
         subject = None
 
     # Ищем названия групп с помощью регулярного выражения
-    group_pattern = r"/([А-Я](\d|[А-Я])[А-Я]-\d{3}[А-Яа-я]+-\d{2})/gm"
+    group_pattern = r"([А-Я][\dА-Я][А-Я]-\d{3}[А-Яа-я]+-\d{2})"
     groups = re.findall(group_pattern, lesson)
 
     # Ищем даты занятий
