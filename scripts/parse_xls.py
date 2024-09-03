@@ -52,7 +52,7 @@ def extract_fio(text):
     else:
         return None  # Если результат отсутствует, возвращаем None
 
-# Функция для извлечения ФИО из текста
+# Функция для извлечения группы из текста
 def extract_group(text):
     parts = text.split("группы")  # Разделяем текст по слову "группы"
     if len(parts) > 1:
@@ -106,7 +106,7 @@ def extract_single_lesson_info(lesson):
         subject = None
 
     # Ищем названия групп с помощью регулярного выражения
-    group_pattern = r"([А-Я]\d[А-Я]-\d{3}[А-Яа-я]+-\d{2})"
+    group_pattern = r"/([А-Я](\d|[А-Я])[А-Я]-\d{3}[А-Яа-я]+-\d{2})/gm"
     groups = re.findall(group_pattern, lesson)
 
     # Ищем даты занятий
