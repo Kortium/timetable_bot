@@ -4,7 +4,7 @@ __pycache__/
 *.json
 *.pdf
 *.svg
-venv/
+.venv/
 scripts/times.ttf
 data/*
 env/

@@ -8,16 +8,21 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 scripts_path = os.path.join(dir_path, '..', 'scripts')
 sys.path.append(scripts_path)
 
-from dotenv import load_dotenv
-from build_svg import prepare_data, TableFormer  # Импорт функций для подготовки данных и формирования SVG таблицы
-from parse_xls import read_professor, read_student, check_type, DocType  # Импорт функции для чтения данных из xlsx файла
-import cairosvg  # Импорт модуля для конвертации SVG в PDF
-from telegram import Update  # Импорт класса Update для обработки обновлений в Telegram
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler  # Импорт необходимых классов для работы бота
 import datetime  # Импорт модуля datetime для работы с датами
 import traceback
-import datetime
+
+import cairosvg  # Импорт модуля для конвертации SVG в PDF
+from build_svg import (  # Импорт функций для подготовки данных и формирования SVG таблицы
+    TableFormer, prepare_data)
+from dotenv import load_dotenv
+from parse_xls import (  # Импорт функции для чтения данных из xlsx файла
+    DocType, check_type, read_professor, read_student)
+from telegram import \
+    Update  # Импорт класса Update для обработки обновлений в Telegram
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (  # Импорт необходимых классов для работы бота
+    CallbackContext, CallbackQueryHandler, CommandHandler, Filters,
+    MessageHandler, Updater)
 
 # Загрузка переменных окружения из файла .env
 load_dotenv()
@@ -156,11 +161,11 @@ def auto_range(update: Update, context: CallbackContext) -> None:
     user_id = query.message.chat_id
     # Обрабатываем ответы на кнопки
     if query.data == 'all':
-        text="01.09-31.12"
+        text="10.02-07.06"
     elif query.data == 'now':
         current_date = datetime.datetime.now()
         formatted_date = current_date.strftime('%d.%m')
-        text=f"{formatted_date}-31.12"
+        text=f"{formatted_date}-07.06"
     elif query.data == 'short':
         current_date = datetime.datetime.now()
         end_date = current_date + datetime.timedelta(days=14)
@@ -168,9 +173,9 @@ def auto_range(update: Update, context: CallbackContext) -> None:
         formatted_end_date = end_date.strftime('%d.%m')
         text = f"{formatted_current_date}-{formatted_end_date}"
     elif query.data == 'first_half':
-        text="01.09-01.11"
+        text="10.02-01.04"
     elif query.data == 'second_half':
-        text="01.11-31.12"
+        text="01.04-07.06"
     user_name = query.from_user.first_name
     try:
         # Преобразуем текст в диапазон дат

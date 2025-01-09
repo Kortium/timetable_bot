@@ -1,18 +1,19 @@
-import os
-import json
-import colorsys
 import base64
-from math import ceil, floor
-import svgwrite
+import colorsys
 import hashlib
-from datetime import timedelta, datetime
-from parse_xls import extract_initials, shorten_group  # Подключение специализированных функций из файла parse_xls.py
+import json
+import os
+from datetime import datetime, timedelta
+from math import ceil, floor
+
+import svgwrite
+from parse_xls import (  # Подключение специализированных функций из файла parse_xls.py
+    extract_initials, shorten_group)
 from PIL import ImageFont
 
-
 # Задаем начальную и конечную даты семестра
-SEM_START = datetime(2024, 9, 2)
-SEM_END = datetime(2024, 12, 31)
+SEM_START = datetime(2025, 2, 10)
+SEM_END = datetime(2025, 6, 7)
 
 # Получаем текущую директорию, где находится выполняемый скрипт
 current_directory = os.path.dirname(os.path.abspath(__file__))

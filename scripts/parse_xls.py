@@ -1,14 +1,16 @@
-import openpyxl
-from datetime import datetime, timedelta
 import re
+from datetime import datetime, timedelta
 from enum import Enum
+
+import openpyxl
+
 
 class DocType(Enum):
     PROFESSOR = 1
     STUDENT = 2
 
 
-YEAR = 2024  # Определяем константу для года, который будет использоваться в коде
+YEAR = 2025  # Определяем константу для года, который будет использоваться в коде
 
 
 # Функция для извлечения инициалов из названия предмета
