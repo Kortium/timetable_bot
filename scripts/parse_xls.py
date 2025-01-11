@@ -112,11 +112,11 @@ def extract_single_lesson_info(lesson):
     groups = re.findall(group_pattern, lesson)
 
     # Ищем даты занятий
-    dates_match = re.search(r"(\d{2}\.\d{2}(?:-\d{2}\.\d{2})?)", lesson)
-    if dates_match:
-        dates = dates_match.group(1)
-        if "-" not in dates:
-            dates = f"{dates}-{dates}"
+    dates = re.findall(r"(\d{2}\.\d{2}(?:-\d{2}\.\d{2})?)", lesson)
+    if dates:
+        for i, d in enumerate(dates):
+            if '-' not in d:
+                dates[i] = f"{d}-{d}"
     else:
         dates = None
     return room, subject, lesson_type, groups, dates  # Возвращаем извлеченные данные о занятии
@@ -289,47 +289,48 @@ def read_professor(file_name):
                         if exercise in added_exercises:
                             continue # Пропускаем, если занятие уже обработано
                         added_exercises.append(exercise)
-                        room, subject, lesson_type, group, date_range = exercise
+                        room, subject, lesson_type, group, date_list = exercise
                         # Разбор дат начала и конца занятий
-                        start_date_str, end_date_str = date_range.split('-')
-                        start_date = datetime.strptime(start_date_str + "." + str(YEAR), '%d.%m.%Y')
-                        end_date = datetime.strptime(end_date_str + "." + str(YEAR), '%d.%m.%Y')
-                        once_in_two_weeks = True # Переключатель для занятий через неделю
-                        for date in get_dates_between(start_date, end_date, day_mapping[cell.row]):
-                            # Проверяем, соответствует ли дата текущей строке расписания
-                            if date.weekday() == day_mapping[cell.row]:
-                                # Получаем следующую ячейку для проверки, объединено ли занятие
-                                next_cell = sheet.cell(row=cell.row, column=cell.column + 1)
-                                joined = check_if_exercise_joined(exercise, next_cell)
-                                if every_week:
-                                    # Формируем структуру занятия, если оно каждую неделю
-                                    exercise_struct = form_exercise(date, cell, next_cell, joined, room, subject, lesson_type, group)
-                                    # Проверяем и добавляем занятие в словарь по датам и времени
-                                    if (date, exercise_struct["time_start"], exercise_struct["time_end"]) not in exercises_by_date:
-                                        exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])] = []
-                                    exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])].append(exercise)
-                                    # Если занятие объединено, добавляем информацию о времени объединенного занятия
-                                    if exercise_struct["joined"]:
-                                        if (date, exercise_struct["time_start_s"], exercise_struct["time_end_s"]) not in exercises_by_date:
-                                            exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])] = []
-                                        exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])].append(exercise)
-                                    # Добавляем структуру занятия в список занятий
-                                    lessons.append(exercise_struct)
-                                else:
-                                    # Если занятие через неделю, переключаемся на следующую неделю
-                                    if once_in_two_weeks:
+                        for date_range in date_list:
+                            start_date_str, end_date_str = date_range.split('-')
+                            start_date = datetime.strptime(start_date_str + "." + str(YEAR), '%d.%m.%Y')
+                            end_date = datetime.strptime(end_date_str + "." + str(YEAR), '%d.%m.%Y')
+                            once_in_two_weeks = True # Переключатель для занятий через неделю
+                            for date in get_dates_between(start_date, end_date, day_mapping[cell.row]):
+                                # Проверяем, соответствует ли дата текущей строке расписания
+                                if date.weekday() == day_mapping[cell.row]:
+                                    # Получаем следующую ячейку для проверки, объединено ли занятие
+                                    next_cell = sheet.cell(row=cell.row, column=cell.column + 1)
+                                    joined = check_if_exercise_joined(exercise, next_cell)
+                                    if every_week:
+                                        # Формируем структуру занятия, если оно каждую неделю
                                         exercise_struct = form_exercise(date, cell, next_cell, joined, room, subject, lesson_type, group)
+                                        # Проверяем и добавляем занятие в словарь по датам и времени
                                         if (date, exercise_struct["time_start"], exercise_struct["time_end"]) not in exercises_by_date:
                                             exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])] = []
                                         exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])].append(exercise)
+                                        # Если занятие объединено, добавляем информацию о времени объединенного занятия
                                         if exercise_struct["joined"]:
                                             if (date, exercise_struct["time_start_s"], exercise_struct["time_end_s"]) not in exercises_by_date:
                                                 exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])] = []
                                             exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])].append(exercise)
+                                        # Добавляем структуру занятия в список занятий
                                         lessons.append(exercise_struct)
-                                        once_in_two_weeks = False # Переключаемся на другую неделю
                                     else:
-                                        once_in_two_weeks = True # Следующая итерация будет для "другой" недели
+                                        # Если занятие через неделю, переключаемся на следующую неделю
+                                        if once_in_two_weeks:
+                                            exercise_struct = form_exercise(date, cell, next_cell, joined, room, subject, lesson_type, group)
+                                            if (date, exercise_struct["time_start"], exercise_struct["time_end"]) not in exercises_by_date:
+                                                exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])] = []
+                                            exercises_by_date[(date, exercise_struct["time_start"], exercise_struct["time_end"])].append(exercise)
+                                            if exercise_struct["joined"]:
+                                                if (date, exercise_struct["time_start_s"], exercise_struct["time_end_s"]) not in exercises_by_date:
+                                                    exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])] = []
+                                                exercises_by_date[(date, exercise_struct["time_start_s"], exercise_struct["time_end_s"])].append(exercise)
+                                            lessons.append(exercise_struct)
+                                            once_in_two_weeks = False # Переключаемся на другую неделю
+                                        else:
+                                            once_in_two_weeks = True # Следующая итерация будет для "другой" недели
 
     # Строка для сбора ошибок в расписании
     erorrs = ""
@@ -442,3 +443,18 @@ def read_student(file_name):
                 erorrs += f"{val[1]} ({val[0]}) {val[3]}\n"
     # Возвращаем ФИО преподавателя, список занятий и ошибки
     return group, lessons, erorrs
+
+
+if __name__ == '__main__':
+    import os
+    import sys
+
+    # Получаем абсолютный путь к директории, где находится main.py
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    # Добавляем путь к папке scripts, чтобы мы могли импортировать из неё модули
+    scripts_path = os.path.join(dir_path, '..')
+    sys.path.append(scripts_path)
+
+    file_name = "data/example.xlsx"
+    name, exercises, errors = read_professor(file_name)
+    print(exercises)
