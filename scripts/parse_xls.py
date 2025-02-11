@@ -92,7 +92,7 @@ def extract_professor_info(text):
 # Функция для извлечения информации о конкретном занятии
 def extract_single_lesson_info(lesson):
     # Ищем информацию о комнате с помощью регулярного выражения
-    room_match = re.search(r"ауд\.(каф\.\(-\)|\d+\([А-Яа-я\s]+\)|\d+\(?\d?\)?)", lesson)
+    room_match = re.search(r"ауд\.(каф\.\(-\)|\d+\([А-Яа-я\s]+\)|\d+\(?\d?\)?|Зал\s+[А-Яа-я]+\(\d+\))", lesson)
     room = room_match.group(1) if room_match else None
 
     # Ищем тип занятия (ЛР, ЛК, ПЗ)
