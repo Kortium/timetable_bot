@@ -221,7 +221,7 @@ class TableFormer:
                  end_date,
                  exercises,
                  weekday_time_spans,
-                 file_name):
+                 file_name, no_color=False):
         # Инициализация класса с заданными параметрами.
         delta = timedelta(days=1)
 
@@ -238,6 +238,7 @@ class TableFormer:
         # Запись упражнений в словарь только в том случае, если они в пределах заданных дат.
         self.exercises = {key: value for key, value in exercises.items() if key >= self.start_date and key < self.end_date}
         self.weekday_time_spans = weekday_time_spans  # Расписание по времени и дням недели
+        self.no_color = no_color
 
         # Установка постоянных отступов и размеров элементов таблицы.
         self.margin_top = 50
@@ -268,8 +269,10 @@ class TableFormer:
             subject = extract_initials(exercise["subject"])
         group = exercise.get("group", exercise.get("professor"))
         room = exercise["room"]
-
-        fill_color = get_color(subject, exercise["type"], group)
+        if self.no_color:
+            fill_color = '#ffffff'
+        else:
+            fill_color = get_color(subject, exercise["type"], group)
         if exercise["joined"] and exercise["type"] == "ЛР":
             rect = self.dwg.rect(insert=(x, y), size=(self.cell_width, self.cell_height*2), fill=fill_color,
                                  fill_opacity=0.5, rx=10, ry=10, stroke='black')

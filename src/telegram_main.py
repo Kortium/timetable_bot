@@ -29,6 +29,7 @@ load_dotenv()
 
 # Получение ID администратора и токена бота из переменных окружения
 ADMIN_ID = os.getenv('ADMIN_ID')
+MODERATOR_ID = int(os.getenv('MODERATOR_ID'))
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 
 def notify_admin(context: CallbackContext, text: str) -> None:
@@ -90,7 +91,10 @@ def handle_text(update: Update, context: CallbackContext) -> None:
             exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
             try:
                 # Создаём расписание в виде SVG и конвертируем его в PDF
-                svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                no_color = False
+                if user_id==MODERATOR_ID:
+                    no_color = True
+                svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg", no_color)
                 svg_table_former.draw_timetable()
                 svg_table_former.save()
                 cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
@@ -117,7 +121,10 @@ def handle_text(update: Update, context: CallbackContext) -> None:
             exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
             try:
                 # Создаём расписание в виде SVG и конвертируем его в PDF
-                svg_table_former = TableFormer(group, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                no_color = False
+                if user_id==MODERATOR_ID:
+                    no_color = True
+                svg_table_former = TableFormer(group, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg", no_color)
                 svg_table_former.draw_timetable()
                 svg_table_former.save()
                 cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
@@ -195,7 +202,10 @@ def auto_range(update: Update, context: CallbackContext) -> None:
             exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
             try:
                 # Создаём расписание в виде SVG и конвертируем его в PDF
-                svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                no_color = False
+                if user_id==MODERATOR_ID:
+                    no_color = True
+                svg_table_former = TableFormer(name, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg", no_color)
                 svg_table_former.draw_timetable()
                 svg_table_former.save()
                 cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
@@ -224,7 +234,10 @@ def auto_range(update: Update, context: CallbackContext) -> None:
             exercises, weekday_time_spans = prepare_data(exercises, start_date, end_date)
             try:
                 # Создаём расписание в виде SVG и конвертируем его в PDF
-                svg_table_former = TableFormer(group, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg")
+                no_color = False
+                if user_id==MODERATOR_ID:
+                    no_color = True
+                svg_table_former = TableFormer(group, start_date, end_date, exercises, weekday_time_spans, f"timetable_{user_id}.svg", no_color)
                 svg_table_former.draw_timetable()
                 svg_table_former.save()
                 cairosvg.svg2pdf(url=f"timetable_{user_id}.svg", write_to=f"timetable_{user_id}.pdf")
