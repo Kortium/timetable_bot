@@ -23,8 +23,8 @@ def main():
     file_name = os.path.join(dir_path, '..', 'data', 'example_professor.xlsx')
     
     # Задаём диапазон дат, который хотите обработать
-    start_date = datetime.datetime(2024, 2, 12)
-    end_date   = datetime.datetime(2024, 6, 1)
+    start_date = datetime.datetime(2025, 9, 1)
+    end_date   = datetime.datetime(2025, 12, 31)
 
     try:
         # Определяем тип файла (преподаватель / студент)
