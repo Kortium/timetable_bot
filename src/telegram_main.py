@@ -168,11 +168,11 @@ def auto_range(update: Update, context: CallbackContext) -> None:
     user_id = query.message.chat_id
     # Обрабатываем ответы на кнопки
     if query.data == 'all':
-        text="10.02-07.06"
+        text="01.09-31.12"
     elif query.data == 'now':
         current_date = datetime.datetime.now()
         formatted_date = current_date.strftime('%d.%m')
-        text=f"{formatted_date}-07.06"
+        text=f"{formatted_date}-31.12"
     elif query.data == 'short':
         current_date = datetime.datetime.now()
         end_date = current_date + datetime.timedelta(days=14)
@@ -180,9 +180,9 @@ def auto_range(update: Update, context: CallbackContext) -> None:
         formatted_end_date = end_date.strftime('%d.%m')
         text = f"{formatted_current_date}-{formatted_end_date}"
     elif query.data == 'first_half':
-        text="10.02-01.04"
+        text="01.09-03.11"
     elif query.data == 'second_half':
-        text="01.04-07.06"
+        text="03.11-31.12"
     user_name = query.from_user.first_name
     try:
         # Преобразуем текст в диапазон дат
