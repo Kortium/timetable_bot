@@ -1,7 +1,7 @@
+import datetime
 import os
 import sys
 import traceback
-import datetime
 
 # Подключаем локально написанные модули из папки scripts
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -12,6 +12,7 @@ sys.path.append(scripts_path)
 from build_svg import TableFormer, prepare_data
 from parse_xls import DocType, check_type, read_professor, read_student
 
+
 def main():
     """
     Локальный скрипт для отладки методов parse_xls и build_svg
@@ -20,11 +21,11 @@ def main():
     """
     # Укажите путь к нужному файлу:
     # Например, example_professor.xlsx или example_student.xlsx
-    file_name = os.path.join(dir_path, '..', 'data', 'example_professor.xlsx')
+    file_name = os.path.join(dir_path, '..', 'data', 'example.xlsx')
     
     # Задаём диапазон дат, который хотите обработать
-    start_date = datetime.datetime(2025, 9, 1)
-    end_date   = datetime.datetime(2025, 12, 31)
+    start_date = datetime.datetime(2026, 2, 9)
+    end_date   = datetime.datetime(2026, 6, 5)
 
     try:
         # Определяем тип файла (преподаватель / студент)
