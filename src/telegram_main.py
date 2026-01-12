@@ -75,7 +75,7 @@ def handle_text(update: Update, context: CallbackContext) -> None:
     user_name = update.message.from_user.first_name
     try:
         # Преобразуем текст в диапазон дат
-        current_year = datetime.datetime.now().year+1
+        current_year = datetime.datetime.now().year
         start_date, end_date = [
             datetime.datetime.strptime(f"{current_year}.{date.strip()}", "%Y.%d.%m") for date in text.split('-')
         ]
@@ -186,7 +186,7 @@ def auto_range(update: Update, context: CallbackContext) -> None:
     user_name = query.from_user.first_name
     try:
         # Преобразуем текст в диапазон дат
-        current_year = datetime.datetime.now().year+1
+        current_year = datetime.datetime.now().year
         start_date, end_date = [
             datetime.datetime.strptime(f"{current_year}.{date.strip()}", "%Y.%d.%m") for date in text.split('-')
         ]
